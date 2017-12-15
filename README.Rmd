@@ -1,0 +1,67 @@
+---
+output: github_document
+---
+
+[![Travis build status](https://travis-ci.org/USCBiostats/rphyloxml.svg?branch=master)](https://travis-ci.org/USCBiostats/rphyloxml)
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+# rphyloxml
+
+rphyloxml provides access to the [phyloXML](http://www.phyloxml.org) file format. For now, the only functions that are implemented in the package are:
+
+- `as_phyloxml`: A method to coerce `phylo` objects from the `ape` package as phyloXML (XML) documents.
+- `validate_phyloxml`: A wrapper of `xml2::xml_validate`, which allows validating a phyloXML doc using the phyloxml.xsd schema (see [here](http://www.phyloxml.org/1.20/phyloxml.xsd))
+
+This package has been motivated to be used with the javascript library [jsPhyloSVG](http://www.jsphylosvg.org), for which we are currently developing an R package with the same name that provides an htmlwidget [here](https://uscbiostats.github.com/jsPhyloSVG).
+
+## Installation
+
+You can install rphyloxml from github with:
+
+```{r gh-installation, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("USCBiostats/rphyloxml")
+```
+
+## Example
+
+In the following example, we create a random tree using the rtree function from the ape package, and later on coerce it into a phyloXML document using `as_phyloxml`.
+
+```{r random-tree}
+library(ape)
+library(rphyloxml)
+set.seed(12)
+
+x <- rtree(3)
+x
+```
+
+```{r coercion}
+z <- as_phyloxml(x)
+z
+```
+
+You can get a "nicer" view of it by doing the following:
+
+```{r nice}
+cat(as.character(z))
+```
+
+And to store the document, you just need to use `xml2` (which is what powers the package) as follows:
+
+```r
+xml2::write_xml(z, "mynicetree.xml")
+```
+
+
+
+

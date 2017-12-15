@@ -1,2 +1,9 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^playground$
+^LICENSE\.md$
+^vignettes/han-and-zmasek-bmc-bioinformatics-2009\.pdf$
+^\.travis\.yml$
+^appveyor\.yml$
+^README\.Rmd$
+^docs$

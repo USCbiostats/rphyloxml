@@ -1,12 +1,18 @@
 Package: rphyloxml
 Version: 0.0.0.9000
+Date: 2017-12-14
 Title: Read and write phyloXML files in R
-Description: What the package does (one paragraph).
-Authors@R: person("First", "Last", , "first.last@example.com", c("aut", "cre"))
-License: What license it uses
+Description: The package provides function for reading and writing phylogenetic
+  data as specified by the "phyloXML" format <http://www.phyloxml.org/>.
+Authors@R: person("George", "Vega Yon", , "g.vegayon@gmail.com", c("aut", "cre"))
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 ByteCompile: true
+URL: https://USCBiostats.github.io/rphyloxml
+BugReports: https://github.com/USCBiostats/rphyloxml/issues
 Imports: 
     xml2,
     ape
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.0.1.9000
