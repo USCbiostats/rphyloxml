@@ -62,7 +62,9 @@
 <p>rphyloxml provides access to the <a href="http://www.phyloxml.org">phyloXML</a> file format. For now, the only functions that are implemented in the package are:</p>
 <ul>
 <li>
-<code>as_phyloxml</code>: A method to coerce <code>phylo</code> objects from the <code>ape</code> package as phyloXML (XML) documents.</li>
+<code>write_phyloxml</code>: A method to coerce <code>phylo</code> objects from the <code>ape</code> package as phyloXML (XML) documents.</li>
+<li>
+<code>read_phyloxml</code>: A method to read phyloXML documents into R.</li>
 <li>
 <code>validate_phyloxml</code>: A wrapper of <code><a href="http://www.rdocumentation.org/packages/xml2/topics/xml_validate">xml2::xml_validate</a></code>, which allows validating a phyloXML doc using the phyloxml.xsd schema (see <a href="http://www.phyloxml.org/1.20/phyloxml.xsd">here</a>)</li>
 </ul>
@@ -74,10 +76,10 @@
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages("devtools")</span>
 devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"USCBiostats/rphyloxml"</span>)</code></pre></div>
 </div>
-<div id="example" class="section level2">
+<div id="writing-phyloxml-files" class="section level2">
 <h2 class="hasAnchor">
-<a href="#example" class="anchor"></a>Example</h2>
-<p>In the following example, we create a random tree using the rtree function from the ape package, and later on coerce it into a phyloXML document using <code>as_phyloxml</code>.</p>
+<a href="#writing-phyloxml-files" class="anchor"></a>Writing phyloXML files</h2>
+<p>In the following example, we create a random tree using the rtree function from the ape package, and later on coerce it into a phyloXML document using <code>write_phyloxml</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ape)
 <span class="kw">library</span>(rphyloxml)
 <span class="kw">set.seed</span>(<span class="dv">12</span>)
@@ -91,7 +93,7 @@ x
 <span class="co">#&gt; [1] "t1" "t2" "t3"</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Rooted; includes branch lengths.</span></code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">z &lt;-<span class="st"> </span><span class="kw"><a href="reference/as_phyloxml.html">as_phyloxml</a></span>(x)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">z &lt;-<span class="st"> </span><span class="kw"><a href="reference/write_phyloxml.html">write_phyloxml</a></span>(x)
 z
 <span class="co">#&gt; {xml_document}</span>
 <span class="co">#&gt; &lt;phyloxml schemaLocation="http://www.phyloxml.org http://www.phyloxml.org/1.10/phyloxml.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phyloxml.org"&gt;</span>
@@ -125,6 +127,47 @@ z
 <p>And to store the document, you just need to use <code>xml2</code> (which is what powers the package) as follows:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">xml2<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/xml2/topics/write_xml">write_xml</a></span>(z, <span class="st">"mynicetree.xml"</span>)</code></pre></div>
 </div>
+<div id="reading-xml-files" class="section level2">
+<h2 class="hasAnchor">
+<a href="#reading-xml-files" class="anchor"></a>Reading XML files</h2>
+<p>We will read the file <a href="http://www.phyloxml.org/examples/amphibian_tree_of_life_Frost_DR_2006.xml">amphibian_tree_of_life_Frost_DR_2006.xml</a> available in both the package and the phyloxml website.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Reading from the package files</span>
+fn &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">"phyloxml/amphibian_tree_of_life_Frost_DR_2006.xml"</span>, <span class="dt">package=</span><span class="st">"rphyloxml"</span>)
+xmltree &lt;-<span class="st"> </span><span class="kw"><a href="reference/read_phyloxml.html">read_phyloxml</a></span>(fn)
+
+<span class="kw">str</span>(xmltree, <span class="dv">3</span>)
+<span class="co">#&gt; List of 1</span>
+<span class="co">#&gt;  $ Amphibian Phylogeny, Frost DR, 2006:List of 3</span>
+<span class="co">#&gt;   ..$ .Data     :'data.frame':   715 obs. of  10 variables:</span>
+<span class="co">#&gt;   .. ..$ id           : int [1:715] 359 360 361 362 363 364 365 366 367 368 ...</span>
+<span class="co">#&gt;   .. ..$ name         : logi [1:715] NA NA NA NA NA NA ...</span>
+<span class="co">#&gt;   .. ..$ branch_length: num [1:715] NA NA NA NA NA NA NA NA NA NA ...</span>
+<span class="co">#&gt;   .. ..$ isleaf       : logi [1:715] FALSE FALSE FALSE FALSE FALSE FALSE ...</span>
+<span class="co">#&gt;   .. ..$ parent       : int [1:715] NA 359 360 361 362 363 364 365 366 367 ...</span>
+<span class="co">#&gt;   .. ..$ confidence   :List of 715</span>
+<span class="co">#&gt;   .. ..$ width        :List of 715</span>
+<span class="co">#&gt;   .. ..$ taxonomy     :List of 715</span>
+<span class="co">#&gt;   .. ..$ sequence     :List of 715</span>
+<span class="co">#&gt;   .. ..$ events       :List of 715</span>
+<span class="co">#&gt;   ..$ rooted    : chr "true"</span>
+<span class="co">#&gt;   ..$ rerootable: chr "false"</span>
+<span class="co">#&gt;  - attr(*, "class")= chr "phyloxml"</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># We can coerce this into a mulitphylo list</span>
+(apetree &lt;-<span class="st"> </span><span class="kw"><a href="reference/phyloxml2phylo.html">phyloxml2phylo</a></span>(xmltree))[[<span class="dv">1</span>]]
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Phylogenetic tree with 358 tips and 357 internal nodes.</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Tip labels:</span>
+<span class="co">#&gt;  NA, NA, NA, NA, NA, NA, ...</span>
+<span class="co">#&gt; Node labels:</span>
+<span class="co">#&gt;  NA, NA, NA, NA, NA, NA, ...</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Rooted; includes branch lengths.</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(apetree)
+<span class="co">#&gt; Warning in plot.phylo(x[[i]], ...): 714 branch length(s) NA(s): branch</span>
+<span class="co">#&gt; lengths ignored in the plot</span></code></pre></div>
+<p><img src="reference/figures/README-example-plot-read-1.png" width="100%"></p>
+</div>
 </div>
 </div>
   </div>
@@ -144,7 +187,7 @@ z
 </ul>
 <h2>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://travis-ci.org/USCBiostats/rphyloxml"><img src="https://travis-ci.org/USCBiostats/rphyloxml.svg?branch=master" alt="Travis build status"></a></li>
+<li><a href="https://travis-ci.org/USCbiostats/rphyloxml"><img src="https://travis-ci.org/USCbiostats/rphyloxml.svg?branch=master" alt="Travis build status"></a></li>
 </ul>
 </div>
 

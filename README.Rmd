@@ -2,7 +2,7 @@
 output: github_document
 ---
 
-[![Travis build status](https://travis-ci.org/USCBiostats/rphyloxml.svg?branch=master)](https://travis-ci.org/USCBiostats/rphyloxml)
+[![Travis build status](https://travis-ci.org/USCbiostats/rphyloxml.svg?branch=master)](https://travis-ci.org/USCbiostats/rphyloxml)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -18,7 +18,8 @@ knitr::opts_chunk$set(
 
 rphyloxml provides access to the [phyloXML](http://www.phyloxml.org) file format. For now, the only functions that are implemented in the package are:
 
-- `as_phyloxml`: A method to coerce `phylo` objects from the `ape` package as phyloXML (XML) documents.
+- `write_phyloxml`: A method to coerce `phylo` objects from the `ape` package as phyloXML (XML) documents.
+- `read_phyloxml`: A method to read phyloXML documents into R.
 - `validate_phyloxml`: A wrapper of `xml2::xml_validate`, which allows validating a phyloXML doc using the phyloxml.xsd schema (see [here](http://www.phyloxml.org/1.20/phyloxml.xsd))
 
 This package has been motivated to be used with the javascript library [jsPhyloSVG](http://www.jsphylosvg.org), for which we are currently developing an R package with the same name that provides an htmlwidget [here](https://uscbiostats.github.com/jsPhyloSVG).
@@ -32,9 +33,9 @@ You can install rphyloxml from github with:
 devtools::install_github("USCBiostats/rphyloxml")
 ```
 
-## Example
+## Writing phyloXML files
 
-In the following example, we create a random tree using the rtree function from the ape package, and later on coerce it into a phyloXML document using `as_phyloxml`.
+In the following example, we create a random tree using the rtree function from the ape package, and later on coerce it into a phyloXML document using `write_phyloxml`.
 
 ```{r random-tree}
 library(ape)
@@ -46,7 +47,7 @@ x
 ```
 
 ```{r coercion}
-z <- as_phyloxml(x)
+z <- write_phyloxml(x)
 z
 ```
 
@@ -63,5 +64,26 @@ xml2::write_xml(z, "mynicetree.xml")
 ```
 
 
+## Reading XML files
 
+We will read the file [amphibian_tree_of_life_Frost_DR_2006.xml](http://www.phyloxml.org/examples/amphibian_tree_of_life_Frost_DR_2006.xml) available in both the package and the phyloxml website.
+
+```{r example-read}
+# Reading from the package files
+fn <- system.file("phyloxml/amphibian_tree_of_life_Frost_DR_2006.xml", package="rphyloxml")
+xmltree <- read_phyloxml(fn)
+
+str(xmltree, 3)
+```
+
+
+
+```{r example-read-coerce}
+# We can coerce this into a mulitphylo list
+(apetree <- phyloxml2phylo(xmltree))[[1]]
+```
+
+```{r example-plot-read}
+plot(apetree)
+```
 

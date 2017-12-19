@@ -49,7 +49,7 @@ getseq <- function(tree) {
 #'
 #' @details
 #' So far, this function has a method for [phylo][ape::as.phylo] objects
-#' from the \CRANpkg{ape} package. The following elements are supported:
+#' from the `ape` package. The following elements are supported:
 #'
 #' - Branch lengths as stored in `edge.length`
 #' - Labels, which are exported as `name`, as stored in `tip.label` and, if
@@ -60,7 +60,7 @@ getseq <- function(tree) {
 #' @export
 #' @references
 #' Han M.V. and Zmasek C.M. (2009) "phyloXML: XML for evolutionary biology and
-#' comparative genomics"  BMC Bioinformatics, 10:356 \doi{10.1186/1471-2105-10-356}
+#' comparative genomics"  BMC Bioinformatics, 10:356 \url{doi:10.1186/1471-2105-10-356}
 #' @examples
 #'
 #' # Random tree from the ape package ------------------------------------------
@@ -68,18 +68,17 @@ getseq <- function(tree) {
 #' x <- ape::rtree(5)
 #' x
 #'
-#' as_phyloxml(x)
-#' @aliases phyloxml
+#' write_phyloxml(x)
 #' @seealso [validate_phyloxml]
-as_phyloxml <- function(tree, ...) UseMethod("as_phyloxml")
+write_phyloxml <- function(tree, ...) UseMethod("write_phyloxml")
 
-#' @rdname as_phyloxml
+#' @rdname write_phyloxml
 #' @param xmlns Character scalar. Location of the default namespace
 #' (see the [XML Namespaces](https://www.w3schools.com/xml/xml_namespaces.asp)
 #' section in w3schools).
 #' @param digits Integer scalar. Precision to use when writing numbers.
 #' @export
-as_phyloxml.phylo <- function(
+write_phyloxml.phylo <- function(
   tree,
   name = "A phylogenetic tree",
   description = "Some description",
@@ -196,6 +195,6 @@ validate_phyloxml <- function(x) {
 
   xml2::xml_validate(
     xml2::read_xml(f),
-    xml2::read_xml(system.file("phyloxml/phyloxml.xsd", package="rphyloxml"))
+    phyloXML_xsd()
   )
 }

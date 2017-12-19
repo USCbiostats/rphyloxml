@@ -1,4 +1,10 @@
 2017-12-14  George G. Vega Yon <g.vegayon@gmail.com>:
+	* : Added function to read phyloXML files, and turn that into
+	  ape::phylo objects. Still need to work on how to parse all
+	  the annotations.
+
+
+2017-12-14  George G. Vega Yon <g.vegayon@gmail.com>:
 
 	* : Initial commit (working). Created site and function
 	  as_phyloxml.phylo is working as expected.
