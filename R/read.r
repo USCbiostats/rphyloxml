@@ -10,7 +10,7 @@ fillstill <- function(x) {
   if (is.list(x)) {
     lapply(x, fillstill)
   } else {
-    ifelse(length(x), x, NA)
+    ifelse(length(x), unname(x), NA)
   }
 }
 
@@ -45,9 +45,20 @@ clade_nodes <- function(x) {
 
 }
 
-supportedAnnotations <- c("confidence", "width", "taxonomy", "sequence", "events")
-empty_ann <- structure(rep(list(list(NA)), length(supportedAnnotations)), class="data.frame",
-                       names = supportedAnnotations, row.names=1L)
+supportedAnnotations <- c(
+  "name",
+  "branch_length",
+  "width",
+  "color",
+  "events",
+  "date"
+  )
+
+empty_ann <- structure(
+  rep(list(list(NA)), length(supportedAnnotations)),
+  class="data.frame",
+  names = supportedAnnotations,row.names=1L
+  )
 
 
 #' A recursive function that goes through the list created by xml2::as_list
@@ -71,21 +82,23 @@ clade_to_dat <- function(x, id = list2env(list(id=0L)), parentid=NULL) {
   # y <- dplyr::bind_cols(list(data.frame(id=id[["id"]], isleaf=FALSE, parent = id[["id"]] - 1L), y))
   y <- data.frame(
     id            = id[["id"]],
-    name          = fillstill(x[["name"]][[1]]),
-    branch_length = as.numeric(fillstill(x[["branch_length"]][[1]])),
     isleaf        = FALSE,
-    parent        = fillstill(parentid)
+    parent        = fillstill(parentid),
+    branch_length = fillstill(x[["branch_length"]])[[1]]
   )
 
-  for (a in supportedAnnotations)
-    empty_ann[[a]][1] <- list(fillstill(x[[a]]))
+  # Storing clade information
+  id[["node.meta"]][[id[["id"]]]] <- x[setdiff(names(x), "clade")]
 
-  y <- cbind(y, empty_ann)
+  # for (a in supportedAnnotations)
+  #   empty_ann[[a]][1] <- list(fillstill(x[[a]]))
+
+  # y <- cbind(y, empty_ann)
 
   # Are there any clades?
   clades <- which(names(x) == "clade")
   if (length(clades)) {
-    clades <- do.call(rbind,lapply(x[clades], clade_to_dat, id = id, parentid = y$id))
+    clades <- do.call(rbind, lapply(x[clades], clade_to_dat, id = id, parentid = y$id))
   } else {
     y[["isleaf"]] <- TRUE
   }
@@ -153,7 +166,7 @@ phyloxml_to_phylo <- phyloxml2phylo
 
 
 #' Read phyloXML files
-#' @param x Character scalar. Path to a phyloXML file.
+#' @param x Either a character scalar (path to a phyloXML file) or an `xml` object.
 #' @export
 #'
 #' @details
@@ -200,9 +213,12 @@ read_phyloxml.default <- function(x) {
   trees_pos <- which(names(dat) == "phylogeny")
   ans       <- vector("list", length(trees_pos))
 
+  # Storage environment
+  env <- list2env(list(id=0L, node.meta=list()))
+
   for (i in seq_along(trees_pos)) {
     # Retrieving the topology and data
-    ans[[i]]            <- clade_to_dat(dat[[trees_pos[i]]][["clade"]])
+    ans[[i]]            <- clade_to_dat(dat[[trees_pos[i]]][["clade"]], id = env)
 
     newid               <- recode_tree(ans[[i]])
     ans[[i]]$id         <- newid
@@ -214,6 +230,7 @@ read_phyloxml.default <- function(x) {
     attrs <- attributes(dat[[trees_pos[[i]]]])
     ans[[i]] <- c(
       list(.Data = ans[[i]]),
+      list(node.meta = env[["node.meta"]]),
       attrs[setdiff(names(attrs), "names")]
       )
   }

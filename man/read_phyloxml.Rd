@@ -15,7 +15,7 @@ read_phyloxml(x)
 \method{read_phyloxml}{default}(x)
 }
 \arguments{
-\item{x}{Character scalar. Path to a phyloXML file.}
+\item{x}{Either a character scalar (path to a phyloXML file) or an \code{xml} object.}
 }
 \value{
 A list of class \code{phyloxml} in which each element represents a

@@ -1,5 +1,5 @@
 
-[![Travis build status](https://travis-ci.org/USCbiostats/rphyloxml.svg?branch=master)](https://travis-ci.org/USCbiostats/rphyloxml)
+[![Travis build status](https://travis-ci.org/USCbiostats/rphyloxml.svg?branch=master)](https://travis-ci.org/USCbiostats/rphyloxml) [![Build status](https://ci.appveyor.com/api/projects/status/3pp6ue80rcaj4py5/branch/master?svg=true)](https://ci.appveyor.com/project/gvegayon/rphyloxml/branch/master) [![Coverage status](https://codecov.io/gh/USCBiostats/rphyloxml/branch/master/graph/badge.svg)](https://codecov.io/github/USCBiostats/rphyloxml?branch=master)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 rphyloxml
@@ -8,7 +8,7 @@ rphyloxml
 rphyloxml provides access to the [phyloXML](http://www.phyloxml.org) file format. For now, the only functions that are implemented in the package are:
 
 -   `write_phyloxml`: A method to coerce `phylo` objects from the `ape` package as phyloXML (XML) documents.
--   `read_phyloxml`: A method to read phyloXML documents into R.
+-   `read_phyloxml`: A method to read phyloXML documents into R. It returns a data frame with the structure of the tree and a nested list with each nodes' annotations.
 -   `validate_phyloxml`: A wrapper of `xml2::xml_validate`, which allows validating a phyloXML doc using the phyloxml.xsd schema (see [here](http://www.phyloxml.org/1.20/phyloxml.xsd))
 
 This package has been motivated to be used with the javascript library [jsPhyloSVG](http://www.jsphylosvg.org), for which we are currently developing an R package with the same name that provides an htmlwidget [here](https://uscbiostats.github.com/jsPhyloSVG).
@@ -98,20 +98,242 @@ We will read the file [amphibian\_tree\_of\_life\_Frost\_DR\_2006.xml](http://ww
 fn <- system.file("phyloxml/amphibian_tree_of_life_Frost_DR_2006.xml", package="rphyloxml")
 xmltree <- read_phyloxml(fn)
 
-str(xmltree, 3)
+str(xmltree, 4)
 #> List of 1
-#>  $ Amphibian Phylogeny, Frost DR, 2006:List of 3
-#>   ..$ .Data     :'data.frame':   715 obs. of  10 variables:
+#>  $ Amphibian Phylogeny, Frost DR, 2006:List of 4
+#>   ..$ .Data     :'data.frame':   715 obs. of  4 variables:
 #>   .. ..$ id           : int [1:715] 359 360 361 362 363 364 365 366 367 368 ...
-#>   .. ..$ name         : logi [1:715] NA NA NA NA NA NA ...
-#>   .. ..$ branch_length: num [1:715] NA NA NA NA NA NA NA NA NA NA ...
 #>   .. ..$ isleaf       : logi [1:715] FALSE FALSE FALSE FALSE FALSE FALSE ...
 #>   .. ..$ parent       : int [1:715] NA 359 360 361 362 363 364 365 366 367 ...
-#>   .. ..$ confidence   :List of 715
-#>   .. ..$ width        :List of 715
-#>   .. ..$ taxonomy     :List of 715
-#>   .. ..$ sequence     :List of 715
-#>   .. ..$ events       :List of 715
+#>   .. ..$ branch_length: logi [1:715] NA NA NA NA NA NA ...
+#>   ..$ node.meta :List of 715
+#>   .. ..$ :List of 1
+#>   .. .. ..$ taxonomy:List of 2
+#>   .. ..$ : Named list()
+#>   .. ..$ :List of 1
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ : Named list()
+#>   .. ..$ : Named list()
+#>   .. ..$ : Named list()
+#>   .. ..$ :List of 1
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ : Named list()
+#>   .. ..$ : Named list()
+#>   .. ..$ : Named list()
+#>   .. ..$ :List of 1
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ : Named list()
+#>   .. ..$ : Named list()
+#>   .. ..$ : Named list()
+#>   .. ..$ : Named list()
+#>   .. ..$ : Named list()
+#>   .. ..$ : Named list()
+#>   .. ..$ : Named list()
+#>   .. ..$ : Named list()
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 6
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 5
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 5
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 5
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ : Named list()
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 5
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 6
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 6
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ : Named list()
+#>   .. ..$ : Named list()
+#>   .. ..$ : Named list()
+#>   .. ..$ : Named list()
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ : Named list()
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ : Named list()
+#>   .. ..$ : Named list()
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 1
+#>   .. .. ..$ color:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 4
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 3
+#>   .. ..$ :List of 2
+#>   .. .. ..$ color   :List of 3
+#>   .. .. ..$ taxonomy:List of 5
+#>   .. .. [list output truncated]
 #>   ..$ rooted    : chr "true"
 #>   ..$ rerootable: chr "false"
 #>  - attr(*, "class")= chr "phyloxml"
@@ -121,20 +343,15 @@ str(xmltree, 3)
 # We can coerce this into a mulitphylo list
 (apetree <- phyloxml2phylo(xmltree))[[1]]
 #> 
-#> Phylogenetic tree with 358 tips and 357 internal nodes.
+#> Phylogenetic tree with 0 tips and 357 internal nodes.
 #> 
 #> Tip labels:
-#>  NA, NA, NA, NA, NA, NA, ...
-#> Node labels:
-#>  NA, NA, NA, NA, NA, NA, ...
+#> NULL
 #> 
 #> Rooted; includes branch lengths.
 ```
 
 ``` r
 plot(apetree)
-#> Warning in plot.phylo(x[[i]], ...): 714 branch length(s) NA(s): branch
-#> lengths ignored in the plot
+#> Warning in plot.phylo(x[[i]], ...): found less than 2 tips in the tree
 ```
-
-<img src="man/figures/README-example-plot-read-1.png" width="100%" />

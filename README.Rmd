@@ -2,7 +2,9 @@
 output: github_document
 ---
 
-[![Travis build status](https://travis-ci.org/USCbiostats/rphyloxml.svg?branch=master)](https://travis-ci.org/USCbiostats/rphyloxml)
+[![Travis build status](https://travis-ci.org/USCbiostats/rphyloxml.svg?branch=master)](https://travis-ci.org/USCbiostats/rphyloxml) 
+[![Build status](https://ci.appveyor.com/api/projects/status/3pp6ue80rcaj4py5/branch/master?svg=true)](https://ci.appveyor.com/project/gvegayon/rphyloxml/branch/master) 
+[![Coverage status](https://codecov.io/gh/USCBiostats/rphyloxml/branch/master/graph/badge.svg)](https://codecov.io/github/USCBiostats/rphyloxml?branch=master)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -19,7 +21,7 @@ knitr::opts_chunk$set(
 rphyloxml provides access to the [phyloXML](http://www.phyloxml.org) file format. For now, the only functions that are implemented in the package are:
 
 - `write_phyloxml`: A method to coerce `phylo` objects from the `ape` package as phyloXML (XML) documents.
-- `read_phyloxml`: A method to read phyloXML documents into R.
+- `read_phyloxml`: A method to read phyloXML documents into R. It returns a data frame with the structure of the tree and a nested list with each nodes' annotations.
 - `validate_phyloxml`: A wrapper of `xml2::xml_validate`, which allows validating a phyloXML doc using the phyloxml.xsd schema (see [here](http://www.phyloxml.org/1.20/phyloxml.xsd))
 
 This package has been motivated to be used with the javascript library [jsPhyloSVG](http://www.jsphylosvg.org), for which we are currently developing an R package with the same name that provides an htmlwidget [here](https://uscbiostats.github.com/jsPhyloSVG).
@@ -73,7 +75,7 @@ We will read the file [amphibian_tree_of_life_Frost_DR_2006.xml](http://www.phyl
 fn <- system.file("phyloxml/amphibian_tree_of_life_Frost_DR_2006.xml", package="rphyloxml")
 xmltree <- read_phyloxml(fn)
 
-str(xmltree, 3)
+str(xmltree, 4)
 ```
 
 

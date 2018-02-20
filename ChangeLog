@@ -1,4 +1,13 @@
+2018-02-20  George G. Vega Yon <g.vegayon@gmail.com>:
+
+	* : Metadata is now kept entirely regardless of how it is structured.
+	  Should dedicate time to work on methods how to access it.
+
+	* : Updated example.
+
+
 2017-12-14  George G. Vega Yon <g.vegayon@gmail.com>:
+
 	* : Added function to read phyloXML files, and turn that into
 	  ape::phylo objects. Still need to work on how to parse all
 	  the annotations.
