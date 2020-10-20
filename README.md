@@ -1,20 +1,34 @@
 
-[![Travis build status](https://travis-ci.org/USCbiostats/rphyloxml.svg?branch=master)](https://travis-ci.org/USCbiostats/rphyloxml) [![Build status](https://ci.appveyor.com/api/projects/status/3pp6ue80rcaj4py5/branch/master?svg=true)](https://ci.appveyor.com/project/gvegayon/rphyloxml/branch/master) [![Coverage status](https://codecov.io/gh/USCBiostats/rphyloxml/branch/master/graph/badge.svg)](https://codecov.io/github/USCBiostats/rphyloxml?branch=master)
+[![Travis build
+status](https://travis-ci.org/USCbiostats/rphyloxml.svg?branch=master)](https://travis-ci.org/USCbiostats/rphyloxml)
+[![Build
+status](https://ci.appveyor.com/api/projects/status/3pp6ue80rcaj4py5/branch/master?svg=true)](https://ci.appveyor.com/project/gvegayon/rphyloxml/branch/master)
+[![Coverage
+status](https://codecov.io/gh/USCBiostats/rphyloxml/branch/master/graph/badge.svg)](https://codecov.io/github/USCBiostats/rphyloxml?branch=master)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-rphyloxml
-=========
 
-rphyloxml provides access to the [phyloXML](http://www.phyloxml.org) file format. For now, the only functions that are implemented in the package are:
+# rphyloxml
 
--   `write_phyloxml`: A method to coerce `phylo` objects from the `ape` package as phyloXML (XML) documents.
--   `read_phyloxml`: A method to read phyloXML documents into R. It returns a data frame with the structure of the tree and a nested list with each nodes' annotations.
--   `validate_phyloxml`: A wrapper of `xml2::xml_validate`, which allows validating a phyloXML doc using the phyloxml.xsd schema (see [here](http://www.phyloxml.org/1.20/phyloxml.xsd))
+rphyloxml provides access to the [phyloXML](http://www.phyloxml.org)
+file format. For now, the only functions that are implemented in the
+package are:
 
-This package has been motivated to be used with the javascript library [jsPhyloSVG](http://www.jsphylosvg.org), for which we are currently developing an R package with the same name that provides an htmlwidget [here](https://uscbiostats.github.com/jsPhyloSVG).
+  - `write_phyloxml`: A method to coerce `phylo` objects from the `ape`
+    package as phyloXML (XML) documents.
+  - `read_phyloxml`: A method to read phyloXML documents into R. It
+    returns a data frame with the structure of the tree and a nested
+    list with each nodes’ annotations.
+  - `validate_phyloxml`: A wrapper of `xml2::xml_validate`, which allows
+    validating a phyloXML doc using the phyloxml.xsd schema (see
+    [here](http://www.phyloxml.org/1.20/phyloxml.xsd))
 
-Installation
-------------
+This package has been motivated to be used with the javascript library
+[jsPhyloSVG](http://www.jsphylosvg.org), for which we are currently
+developing an R package with the same name that provides an htmlwidget
+[here](https://uscbiostats.github.com/jsPhyloSVG).
+
+## Installation
 
 You can install rphyloxml from github with:
 
@@ -23,10 +37,11 @@ You can install rphyloxml from github with:
 devtools::install_github("USCBiostats/rphyloxml")
 ```
 
-Writing phyloXML files
-----------------------
+## Writing phyloXML files
 
-In the following example, we create a random tree using the rtree function from the ape package, and later on coerce it into a phyloXML document using `write_phyloxml`.
+In the following example, we create a random tree using the rtree
+function from the ape package, and later on coerce it into a phyloXML
+document using `write_phyloxml`.
 
 ``` r
 library(ape)
@@ -39,7 +54,7 @@ x
 #> Phylogenetic tree with 3 tips and 2 internal nodes.
 #> 
 #> Tip labels:
-#> [1] "t1" "t2" "t3"
+#> [1] "t2" "t3" "t1"
 #> 
 #> Rooted; includes branch lengths.
 ```
@@ -49,32 +64,32 @@ z <- write_phyloxml(x)
 z
 #> {xml_document}
 #> <phyloxml schemaLocation="http://www.phyloxml.org http://www.phyloxml.org/1.10/phyloxml.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phyloxml.org">
-#> [1] <phylogeny rooted="true">\n  <name>A phylogenetic tree</name>\n  <de ...
+#> [1] <phylogeny rooted="true" rerootable="false">\n    <name>A phylogenetic tr ...
 ```
 
-You can get a "nicer" view of it by doing the following:
+You can get a “nicer” view of it by doing the following:
 
 ``` r
 cat(as.character(z))
 #> <?xml version="1.0" encoding="UTF-8"?>
 #> <phyloxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phyloxml.org" xsi:schemaLocation="http://www.phyloxml.org http://www.phyloxml.org/1.10/phyloxml.xsd">
-#>   <phylogeny rooted="true">
+#>   <phylogeny rooted="true" rerootable="false">
 #>     <name>A phylogenetic tree</name>
 #>     <description>Some description</description>
 #>     <clade>
 #>       <clade>
 #>         <branch_length>0.26938187633641064167</branch_length>
 #>         <clade>
-#>           <name>t1</name>
+#>           <name>t2</name>
 #>           <branch_length>0.16934812325052917004</branch_length>
 #>         </clade>
 #>         <clade>
-#>           <name>t2</name>
+#>           <name>t3</name>
 #>           <branch_length>0.03389562247321009636</branch_length>
 #>         </clade>
 #>       </clade>
 #>       <clade>
-#>         <name>t3</name>
+#>         <name>t1</name>
 #>         <branch_length>0.17878500418737530708</branch_length>
 #>       </clade>
 #>     </clade>
@@ -82,16 +97,18 @@ cat(as.character(z))
 #> </phyloxml>
 ```
 
-And to store the document, you just need to use `xml2` (which is what powers the package) as follows:
+And to store the document, you just need to use `xml2` (which is what
+powers the package) as follows:
 
 ``` r
 xml2::write_xml(z, "mynicetree.xml")
 ```
 
-Reading XML files
------------------
+## Reading XML files
 
-We will read the file [amphibian\_tree\_of\_life\_Frost\_DR\_2006.xml](http://www.phyloxml.org/examples/amphibian_tree_of_life_Frost_DR_2006.xml) available in both the package and the phyloxml website.
+We will read the file
+[amphibian\_tree\_of\_life\_Frost\_DR\_2006.xml](http://www.phyloxml.org/examples/amphibian_tree_of_life_Frost_DR_2006.xml)
+available in both the package and the phyloxml website.
 
 ``` r
 # Reading from the package files
@@ -343,15 +360,18 @@ str(xmltree, 4)
 # We can coerce this into a mulitphylo list
 (apetree <- phyloxml2phylo(xmltree))[[1]]
 #> 
-#> Phylogenetic tree with 0 tips and 357 internal nodes.
+#> Phylogenetic tree with 358 tips and 357 internal nodes.
 #> 
 #> Tip labels:
-#> NULL
+#>  =119767|Capensibufo rosei, =125255|Capensibufo tradouwi, =119769|Stephopaedes anotis, =8386|Bufo marinus, =8384|Bufo bufo, =103606|Torrentophryne aspinia, ...
 #> 
 #> Rooted; includes branch lengths.
 ```
 
 ``` r
-plot(apetree)
-#> Warning in plot.phylo(x[[i]], ...): found less than 2 tips in the tree
+plot(apetree, cex=.25)
+#> Warning in plot.phylo(x[[i]], ...): 715 branch length(s) NA(s): branch lengths
+#> ignored in the plot
 ```
+
+<img src="man/figures/README-example-plot-read-1.png" width="100%" />

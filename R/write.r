@@ -80,10 +80,10 @@ write_phyloxml <- function(tree, ...) UseMethod("write_phyloxml")
 #' @export
 write_phyloxml.phylo <- function(
   tree,
-  name = "A phylogenetic tree",
+  name        = "A phylogenetic tree",
   description = "Some description",
-  xmlns = "http://www.phyloxml.org",
-  digits = 20,
+  xmlns       = "http://www.phyloxml.org",
+  digits      = 20,
   ...
 ) {
 
@@ -138,7 +138,8 @@ write_phyloxml.phylo <- function(
   # Creating main document
   phylogeny <- xml2::xml_new_root(
     "phylogeny",
-    rooted = ifelse(ape::is.rooted(tree), "true", "false")
+    rooted = ifelse(ape::is.rooted(tree), "true", "false"),
+    rerootable = "false"
   )
 
   # Adding features
@@ -159,11 +160,15 @@ write_phyloxml.phylo <- function(
 
   xml2::xml_add_child(doc, phylogeny)
 
-  if (!(err <- validate_phyloxml(doc)))
+  # Creating a file
+  tmp <- tempfile()
+  xml2::write_xml(doc, file = tmp)
+
+  if (!(err <- validate_phyloxml(tmp)))
     stop("Ups! Something went wrong. The validation of the PhyloXML document failed:",
          err, call. = FALSE)
 
-  doc
+  xml2::read_xml(tmp, options = "HUGE")
 
 }
 
@@ -188,9 +193,10 @@ validate_phyloxml <- function(x) {
     xml2::write_xml(x, f, options = c("format"))
   } else {
 
-    if (!file.exists(f))
-      stop("The document", f, "does not exists.", call. = FALSE)
+    if (!file.exists(x))
+      stop("The document", x, "does not exists.", call. = FALSE)
     f <- x
+
   }
 
   xml2::xml_validate(

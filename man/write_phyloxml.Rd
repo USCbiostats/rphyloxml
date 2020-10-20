@@ -7,9 +7,14 @@
 \usage{
 write_phyloxml(tree, ...)
 
-\method{write_phyloxml}{phylo}(tree, name = "A phylogenetic tree",
-  description = "Some description", xmlns = "http://www.phyloxml.org",
-  digits = 20, ...)
+\method{write_phyloxml}{phylo}(
+  tree,
+  name = "A phylogenetic tree",
+  description = "Some description",
+  xmlns = "http://www.phyloxml.org",
+  digits = 20,
+  ...
+)
 }
 \arguments{
 \item{tree}{A phylogenetic tree.}

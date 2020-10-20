@@ -90,11 +90,6 @@ clade_to_dat <- function(x, id = list2env(list(id=0L)), parentid=NULL) {
   # Storing clade information
   id[["node.meta"]][[id[["id"]]]] <- x[setdiff(names(x), "clade")]
 
-  # for (a in supportedAnnotations)
-  #   empty_ann[[a]][1] <- list(fillstill(x[[a]]))
-
-  # y <- cbind(y, empty_ann)
-
   # Are there any clades?
   clades <- which(names(x) == "clade")
   if (length(clades)) {
@@ -141,13 +136,36 @@ phyloxml2phylo <- function(x, labvar = "name") {
     node <- which(!leaf)
     leaf <- which(leaf)
 
+    # Making names
+    leaf_phy_id <- sapply(x[[p]][["node.meta"]][leaf], function(m) {
+
+      # ID
+      id <- if (length(m[["taxonomy"]][["id"]])) {
+        paste0(attr(m[["taxonomy"]], "provider"),"=",m[["taxonomy"]][["id"]])
+      } else
+        ""
+
+      # Scientific name
+      sname <- if (length(m[["taxonomy"]][["scientific_name"]])) {
+        m[["taxonomy"]][["scientific_name"]]
+      } else
+        ""
+
+      paste0(id,"|",sname)
+    })
+
+    blength <- if (!length(x[[p]][[".Data"]][["branch_length"]]))
+      rep(1, nrow(x[[p]][[".Data"]]))
+    else
+      x[[p]][[".Data"]][["branch_length"]]
+
     ans[[p]] <- structure(
       with(
         x[[p]][[".Data"]],
         list(
           edge        = unname(cbind(parent, id))[-1L,],
-          tip.label   = x[[p]][[".Data"]][[labvar]][leaf],
-          edge.length = branch_length[-1L],
+          tip.label   = leaf_phy_id,# x[[p]][[".Data"]][[labvar]][leaf],
+          edge.length = blength,
           Nnode       = length(node),
           node.label  = x[[p]][[".Data"]][[labvar]][node]
         )
@@ -165,93 +183,7 @@ phyloxml2phylo <- function(x, labvar = "name") {
 phyloxml_to_phylo <- phyloxml2phylo
 
 
-#' Read phyloXML files
-#' @param x Either a character scalar (path to a phyloXML file) or an `xml` object.
-#' @export
-#'
-#' @details
-#' `phyloxml` objects can be coerced as [ape::multiphylo] using the
-#' [phyloxml2phylo] function.
-#'
-#' @examples
-#' library(ape)
-#' set.seed(1)
-#'
-#' x <- rtree(10)
-#' x2 <- write_phyloxml(x)
-#' read_phyloxml(x2)
-#' @return A list of class `phyloxml` in which each element represents a
-#' tree:
-#' A `data.frame` with the following elements:
-#'
-#' \item{id}{Integer, the id of the node.}
-#' \item{name}{Character, the name of the node (can be `NA`).}
-#' \item{branch_length}{Numeric, the length of the branch (can be `NA`).}
-#' \item{iselaf}{Logical, whether it is leaf (tip) or not.}
-#' \item{parent}{Integer, the id of the parent node.}
-#'
-#' @aliases phyloxml phyloxml-class
-read_phyloxml <- function(x) UseMethod("read_phyloxml")
 
-#' @export
-#' @rdname read_phyloxml
-read_phyloxml.character <- function(x) {
-  # Reading XML, and validating
-  doc <- xml2::read_xml(x)
-
-  read_phyloxml(doc)
-}
-
-#' @export
-#' @rdname read_phyloxml
-read_phyloxml.default <- function(x) {
-
-  # Coercing into a list
-  dat <- xml2::as_list(x)
-
-  # Procesing the data
-  trees_pos <- which(names(dat) == "phylogeny")
-  ans       <- vector("list", length(trees_pos))
-
-  # Storage environment
-  env <- list2env(list(id=0L, node.meta=list()))
-
-  for (i in seq_along(trees_pos)) {
-    # Retrieving the topology and data
-    ans[[i]]            <- clade_to_dat(dat[[trees_pos[i]]][["clade"]], id = env)
-
-    newid               <- recode_tree(ans[[i]])
-    ans[[i]]$id         <- newid
-    ans[[i]]$parent[-1] <- newid[ans[[i]]$parent[-1]]
-
-    rownames(ans[[i]]) <- ans[[i]]$id
-
-    # Getting attributes
-    attrs <- attributes(dat[[trees_pos[[i]]]])
-    ans[[i]] <- c(
-      list(.Data = ans[[i]]),
-      list(node.meta = env[["node.meta"]]),
-      attrs[setdiff(names(attrs), "names")]
-      )
-  }
-
-  # Checking names
-  tnames <- vector("character", length(ans))
-  for (i in seq_along(trees_pos)) {
-    tname <- dat[[trees_pos]][["name"]]
-    if (length(tname))
-      tnames[i] <- tname
-    else
-      tnames[i] <- sprintf("unnamed_tree%03i", i)
-  }
-
-  # Returning
-  structure(
-    ans,
-    names = tnames,
-    class = "phyloxml"
-  )
-}
 
 #
 # set.seed(1)

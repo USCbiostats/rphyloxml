@@ -86,6 +86,6 @@ str(xmltree, 4)
 ```
 
 ```{r example-plot-read}
-plot(apetree)
+plot(apetree, cex=.25)
 ```
 
