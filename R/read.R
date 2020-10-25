@@ -4,6 +4,9 @@ phyloXML_xsd <- function() {
   xml2::read_xml(system.file("phyloxml/phyloxml.xsd", package="rphyloxml"))
 }
 
+#' PhyloXML namespace
+#' An object of class `xml_namespace`
+#' @export
 phyloXML_ns  <- xml2::xml_ns(phyloXML_xsd())
 
 fillstill <- function(x) {
@@ -31,7 +34,7 @@ clade_nodes <- function(x) {
     # Finding definition
     def  <- xml2::xml_find_all(phyloXML_xsd(), sprintf("//xs:element[@name='%s']", n))
 
-    # If it was not successfull
+    # If it was not successful
     if (!length(def))
       stop("The attribute `", n, "` is not part of the phyloXML schema.", call.=FALSE)
 
@@ -131,8 +134,8 @@ phyloxml2phylo <- function(x, labvar = "name") {
 
   for (p in 1L:ntrees) {
 
-    N    <- length(unique(x[[p]][[".Data"]][["id"]]))
-    leaf <- x[[p]][[".Data"]][["isleaf"]]
+    N    <- length(unique(x[[p]][["edges"]][["id"]]))
+    leaf <- x[[p]][["edges"]][["isleaf"]]
     node <- which(!leaf)
     leaf <- which(leaf)
 
@@ -154,20 +157,20 @@ phyloxml2phylo <- function(x, labvar = "name") {
       paste0(id,"|",sname)
     })
 
-    blength <- if (!length(x[[p]][[".Data"]][["branch_length"]]))
-      rep(1, nrow(x[[p]][[".Data"]]))
+    blength <- if (!length(x[[p]][["edges"]][["branch_length"]]))
+      rep(1, nrow(x[[p]][["edges"]]))
     else
-      x[[p]][[".Data"]][["branch_length"]]
+      x[[p]][["edges"]][["branch_length"]]
 
     ans[[p]] <- structure(
       with(
-        x[[p]][[".Data"]],
+        x[[p]][["edges"]],
         list(
           edge        = unname(cbind(parent, id))[-1L,],
-          tip.label   = leaf_phy_id,# x[[p]][[".Data"]][[labvar]][leaf],
+          tip.label   = leaf_phy_id,# x[[p]][["edges"]][[labvar]][leaf],
           edge.length = blength,
           Nnode       = length(node),
-          node.label  = x[[p]][[".Data"]][[labvar]][node]
+          node.label  = x[[p]][["edges"]][[labvar]][node]
         )
       ),
       class = "phylo"

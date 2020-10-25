@@ -1,6 +1,5 @@
 Package: rphyloxml
-Version: 0.0.0.9000
-Date: 2017-12-14
+Version: 0.0-9000
 Title: Read and write phyloXML files in R
 Description: The package provides function for reading and writing phylogenetic
   data as specified by the "phyloXML" format <http://www.phyloxml.org/>.
@@ -13,9 +12,10 @@ URL: https://USCBiostats.github.io/rphyloxml
 BugReports: https://github.com/USCBiostats/rphyloxml/issues
 Imports: 
     xml2,
-    ape
+    ape,
+    stats
 Suggests: 
     RNeXML,
-    covr
+    covr, tinytest
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1

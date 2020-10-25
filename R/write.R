@@ -38,11 +38,19 @@ getseq <- function(tree) {
 
 }
 
-#' Coerce into phyloXML
+#' Save a phylo tree as phyloXML
 #'
 #' Coerce phylogenetic trees to phyloXML documents, objects of class `xml_document`.
 #'
 #' @param tree A phylogenetic tree.
+#' @param file Character scalar. When equal to `""`, the function only prints the xml
+#' document and returns the object invisibly. Otherwise, it will try to write the xml
+#' file to the specified path using [xml2::write_xml()].
+#' @param overwrite When `FALSE`, the function will check first whether `file` exists,
+#' and if so, return with an error.
+#' @param read_options,write_options List of arguments passed to [xml2::read_xml] and
+#' [xml2::write_xml] respectively.
+#' @param events List of events.
 #' @param ... Further arguments to be passed to the method (see details).
 #' @param name Character scalar. Name of the tree.
 #' @param description Character scalar. Description of the tree.
@@ -70,7 +78,15 @@ getseq <- function(tree) {
 #'
 #' write_phyloxml(x)
 #' @seealso [validate_phyloxml]
-write_phyloxml <- function(tree, ...) UseMethod("write_phyloxml")
+write_phyloxml <- function(
+  tree,
+  file          = "",
+  overwrite     = FALSE,
+  read_options  = list(),
+  write_options = list(),
+  events        = list(),
+  ...
+  ) UseMethod("write_phyloxml")
 
 #' @rdname write_phyloxml
 #' @param xmlns Character scalar. Location of the default namespace
@@ -80,12 +96,35 @@ write_phyloxml <- function(tree, ...) UseMethod("write_phyloxml")
 #' @export
 write_phyloxml.phylo <- function(
   tree,
-  name        = "A phylogenetic tree",
-  description = "Some description",
-  xmlns       = "http://www.phyloxml.org",
-  digits      = 20,
+  file          = "",
+  overwrite     = FALSE,
+  read_options  = list(),
+  write_options = list(),
+  events        = list(),
+  name          = "A phylogenetic tree",
+  description   = "Some description",
+  xmlns         = "http://www.phyloxml.org",
+  digits        = 20,
   ...
 ) {
+
+  # Checking if file is to be written
+  if (file != "" && (file.exists(file) & !overwrite)) {
+    stop(
+      "The file ",
+      file,
+      " already exists. If you want ot replace it, use overwrite = TRUE."
+      )
+  }
+
+  # Checking events
+  supported_events <- c("type", "duplications", "speciations", "losses")
+  if (length(events)) {
+
+    if (!names(events) %in% supported_events)
+      stop("One or more of the specified events are not supported.")
+
+  }
 
   # Obtaining the peeling sequence. We create the  tree by working the tree
   # out using a post order traversal.
@@ -162,13 +201,19 @@ write_phyloxml.phylo <- function(
 
   # Creating a file
   tmp <- tempfile()
-  xml2::write_xml(doc, file = tmp)
+  do.call(xml2::write_xml, c(list(doc, file = tmp), write_options))
+  doc <- do.call(xml2::read_xml, c(list(tmp), read_options))
 
-  if (!(err <- validate_phyloxml(tmp)))
+  if (!(err <- validate_phyloxml(doc)))
     stop("Ups! Something went wrong. The validation of the PhyloXML document failed:",
          err, call. = FALSE)
 
-  xml2::read_xml(tmp, options = "HUGE")
+  if (file != "")
+    file.copy(from = tmp, to = file, overwrite = overwrite)
+  else
+    print(doc)
+
+  invisible(doc)
 
 }
 
@@ -178,6 +223,7 @@ write_phyloxml.phylo <- function(
 #' objects using the phyloxml.xsd schema.
 #'
 #' @param x Either an object of class `xml_document` or a path to a file.
+#' @param ... Further options passed to [xml2::read_xml()].
 #'
 #' @details
 #' The schema can be found in \Sexpr{system.file("phyloxml/phyloxml.xsd", package="rphyloxml")}.
@@ -185,22 +231,15 @@ write_phyloxml.phylo <- function(
 #'
 #' @return `TRUE` or `FALSE`
 #' @export
-validate_phyloxml <- function(x) {
+validate_phyloxml <- function(x, ...) {
 
-
-  if (inherits(x, "xml_document")) {
-    f <- tempfile()
-    xml2::write_xml(x, f, options = c("format"))
-  } else {
+  if (inherits(x, "character")) {
 
     if (!file.exists(x))
       stop("The document", x, "does not exists.", call. = FALSE)
-    f <- x
 
+    x <- xml2::read_xml(x, ...)
   }
 
-  xml2::xml_validate(
-    xml2::read_xml(f),
-    phyloXML_xsd()
-  )
+  xml2::xml_validate(x, phyloXML_xsd())
 }

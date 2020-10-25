@@ -12,7 +12,7 @@ read_phyloxml(x, ...)
 
 \method{read_phyloxml}{character}(x, ...)
 
-\method{read_phyloxml}{default}(x)
+\method{read_phyloxml}{default}(x, ...)
 }
 \arguments{
 \item{x}{Either a character scalar (path to a phyloXML file) or an \code{xml} object.}

@@ -38,7 +38,7 @@ read_phyloxml.character <- function(x, ...) {
 
 #' @export
 #' @rdname read_phyloxml
-read_phyloxml.default <- function(x) {
+read_phyloxml.default <- function(x, ...) {
 
   # Extracting only the phylogenies
   dat <- xml2::xml_find_all(x, xpath = "//phy:phylogeny", ns = phyloXML_ns)
@@ -65,7 +65,7 @@ read_phyloxml.default <- function(x) {
     # Getting attributes
     attrs <- attributes(dat[[i]])
     ans[[i]] <- c(
-      list(.Data = ans[[i]]),
+      list(edges = ans[[i]]),
       list(node.meta = env[["node.meta"]]),
       attrs[setdiff(names(attrs), "names")]
     )
@@ -87,4 +87,10 @@ read_phyloxml.default <- function(x) {
     names = tnames,
     class = "phyloxml"
   )
+}
+
+#' @export
+print.phyloxml <- function(x, ...) {
+  cat("A list with ", length(x), " phylogenetic trees.\n")
+  invisible(x)
 }
