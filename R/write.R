@@ -5,16 +5,11 @@ NULL
 
 #' Lists the offspring of each node in a edgelist
 #' @noRd
-list_offspring <- function(edgelist) {
-
-  n <- max(edgelist)
-  ans <- vector("list", n)
-
-  for (i in 1L:n)
-    ans[[i]] <- edgelist[edgelist[,1] == i, 2]
-
-  ans
-
+list_offspring <- function(edgelist, size) {
+  o <- split(edgelist[,2], edgelist[,1])
+  a <- matrix(list(integer(0L)), ncol=1, nrow = size)
+  a[as.integer(names(o))] <- unname(o)
+  a[,1]
 }
 
 #' Prepares a peeling sequence to write down the tree
@@ -23,7 +18,7 @@ list_offspring <- function(edgelist) {
 getseq <- function(tree) {
 
   ord <- ape::postorder(tree)
-  off <- list_offspring(tree$edge)
+  off <- list_offspring(tree$edge, ape::Nnode(tree, internal.only = FALSE))
   lab <- c(tree$tip.label, if (length(tree$node.label)) {
     tree$node.label
   } else {
@@ -50,7 +45,8 @@ getseq <- function(tree) {
 #' and if so, return with an error.
 #' @param read_options,write_options List of arguments passed to [xml2::read_xml] and
 #' [xml2::write_xml] respectively.
-#' @param events List of events.
+#' @param events A [data.frame] with events. It must be `nrow(events) = Nedge(tree)`
+#' (see examples).
 #' @param ... Further arguments to be passed to the method (see details).
 #' @param name Character scalar. Name of the tree.
 #' @param description Character scalar. Description of the tree.
@@ -84,7 +80,7 @@ write_phyloxml <- function(
   overwrite     = FALSE,
   read_options  = list(),
   write_options = list(),
-  events        = list(),
+  events        = NULL,
   ...
   ) UseMethod("write_phyloxml")
 
@@ -100,7 +96,7 @@ write_phyloxml.phylo <- function(
   overwrite     = FALSE,
   read_options  = list(),
   write_options = list(),
-  events        = list(),
+  events        = NULL,
   name          = "A phylogenetic tree",
   description   = "Some description",
   xmlns         = "http://www.phyloxml.org",
@@ -121,8 +117,11 @@ write_phyloxml.phylo <- function(
   supported_events <- c("type", "duplications", "speciations", "losses")
   if (length(events)) {
 
-    if (!names(events) %in% supported_events)
+    if (!colnames(events) %in% supported_events)
       stop("One or more of the specified events are not supported.")
+
+    if (nrow(events) != ape::Nedge(tree))
+      stop("Each element in -events- should be of length Nedge(tree).")
 
   }
 
@@ -154,6 +153,20 @@ write_phyloxml.phylo <- function(
         ans[[i]], "branch_length",
         sprintf(paste0("%.",digits,"f"),tree$edge.length[j])
       )
+
+    # Checking if we need to add events or not
+    if (length(events)) {
+
+      for (e in 1:ncol(events)) {
+
+        if (!is.na(events[j, e]))
+          xml2::xml_add_child(
+            ans[[i]], colnames(events)[e],
+            events[j, e]
+          )
+
+      }
+    }
 
     # Has offspring?
     for (o in pseq$offspring[[i]])

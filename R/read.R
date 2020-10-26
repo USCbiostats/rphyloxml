@@ -59,8 +59,9 @@ supportedAnnotations <- c(
 
 empty_ann <- structure(
   rep(list(list(NA)), length(supportedAnnotations)),
-  class="data.frame",
-  names = supportedAnnotations,row.names=1L
+  class     = "data.frame",
+  names     = supportedAnnotations,
+  row.names = 1L
   )
 
 
@@ -87,7 +88,7 @@ clade_to_dat <- function(x, id = list2env(list(id=0L)), parentid=NULL) {
     id            = id[["id"]],
     isleaf        = FALSE,
     parent        = fillstill(parentid),
-    branch_length = fillstill(x[["branch_length"]])[[1]]
+    branch_length = as.double(fillstill(x[["branch_length"]])[[1]])
   )
 
   # Storing clade information
@@ -117,73 +118,7 @@ recode_tree <- function(x) {
 }
 
 
-#' Coerces a `phyloxml` to `multiphylo`
-#'
-#' This function takes the `phyloxml` object, which is essentially a list, and
-#' returns a object of class [ape::multiphylo]
-#'
-#' @param x An object of class [phyloxml]
-#' @param labvar Character scalar. The name of the variable to be used to
-#' label the nodes and tips of the tree. By default is `name`.
-#' @return An object of class [ape::multiphylo].
-#' @export
-phyloxml2phylo <- function(x, labvar = "name") {
 
-  ntrees <- length(x)
-  ans    <- structure(vector("list", ntrees), class="multiPhylo")
-
-  for (p in 1L:ntrees) {
-
-    N    <- length(unique(x[[p]][["edges"]][["id"]]))
-    leaf <- x[[p]][["edges"]][["isleaf"]]
-    node <- which(!leaf)
-    leaf <- which(leaf)
-
-    # Making names
-    leaf_phy_id <- sapply(x[[p]][["node.meta"]][leaf], function(m) {
-
-      # ID
-      id <- if (length(m[["taxonomy"]][["id"]])) {
-        paste0(attr(m[["taxonomy"]], "provider"),"=",m[["taxonomy"]][["id"]])
-      } else
-        ""
-
-      # Scientific name
-      sname <- if (length(m[["taxonomy"]][["scientific_name"]])) {
-        m[["taxonomy"]][["scientific_name"]]
-      } else
-        ""
-
-      paste0(id,"|",sname)
-    })
-
-    blength <- if (!length(x[[p]][["edges"]][["branch_length"]]))
-      rep(1, nrow(x[[p]][["edges"]]))
-    else
-      x[[p]][["edges"]][["branch_length"]]
-
-    ans[[p]] <- structure(
-      with(
-        x[[p]][["edges"]],
-        list(
-          edge        = unname(cbind(parent, id))[-1L,],
-          tip.label   = leaf_phy_id,# x[[p]][["edges"]][[labvar]][leaf],
-          edge.length = blength,
-          Nnode       = length(node),
-          node.label  = x[[p]][["edges"]][[labvar]][node]
-        )
-      ),
-      class = "phylo"
-    )
-  }
-
-  return(ans)
-
-}
-
-#' @rdname phyloxml2phylo
-#' @export
-phyloxml_to_phylo <- phyloxml2phylo
 
 
 

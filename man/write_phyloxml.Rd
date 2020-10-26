@@ -11,7 +11,7 @@ write_phyloxml(
   overwrite = FALSE,
   read_options = list(),
   write_options = list(),
-  events = list(),
+  events = NULL,
   ...
 )
 
@@ -21,7 +21,7 @@ write_phyloxml(
   overwrite = FALSE,
   read_options = list(),
   write_options = list(),
-  events = list(),
+  events = NULL,
   name = "A phylogenetic tree",
   description = "Some description",
   xmlns = "http://www.phyloxml.org",
@@ -42,7 +42,8 @@ and if so, return with an error.}
 \item{read_options, write_options}{List of arguments passed to \link[xml2:read_xml]{xml2::read_xml} and
 \link[xml2:write_xml]{xml2::write_xml} respectively.}
 
-\item{events}{List of events.}
+\item{events}{A \link{data.frame} with events. It must be \code{nrow(events) = Nedge(tree)}
+(see examples).}
 
 \item{...}{Further arguments to be passed to the method (see details).}
 
